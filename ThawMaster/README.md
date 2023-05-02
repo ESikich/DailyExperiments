@@ -8,6 +8,51 @@ ThawMaster offers a rigorous exploration of the thermal dynamics involved in the
 
 Cooking is a marriage of art and science, with heat transfer playing the role of the matchmaker. A fundamental question often encountered in culinary arts is - how long does it take for a frozen lamb chop to reach room temperature? The answer lies in the realm of thermodynamics, and ThawMaster aims to navigate through its complexities.
 
+## Requirements
+
+To run this program, you will need:
+
+- Python 3
+- NumPy 1.24.3
+- SciPy 1.10.1
+- Matplotlib 3.4.1
+
+You can install these packages using pip:
+
+```pip install -m requirements.txt```
+
+## Program Details
+
+The program uses the following constants:
+
+- `SPEC_HEAT_CAP`: specific heat capacity of the object being cooled, in J/g°C
+- `DENS`: density of the object being cooled, in g/cm³
+- `W`: width of the object being cooled, in cm
+- `L`: length of the object being cooled, in cm
+- `H`: height of the object being cooled, in cm
+- `CONV_HEAT_TRANS_COEF`: convective heat transfer coefficient between the object and the surrounding air, in W/m²K
+- `ROOM_TEMP`: temperature of the surrounding room, in °C
+- `SIM_LEN`: length of time to simulate, in seconds
+- `SIM_STEPS`: number of time steps to simulate
+- `INIT_TEMP_L`: object low range in °C
+- `INIT_TEMP_H`: object high range in °C
+- `ROOM_TEMP_L`: = room temperature low range in °C
+- `ROOM_TEMP_H`: = room temperature high range in °C
+
+### Simulation
+
+The program performs a simulation for all combinations of initial temperature and room temperature in a 2D grid. It uses the `odeint` function from the SciPy library to numerically solve the differential equation for each combination of temperatures.
+
+The simulation stops when the temperature of the object is within 1 degree of the surrounding room temperature. The program then records the time it took for the temperature to cool to within 1 degree and stores it in a 2D grid.
+
+### Visualization
+
+The program visualizes the results using two plots:
+
+- A 3D surface plot that shows the time it takes for the object to cool to within 1 degree as a function of the initial temperature and room temperature.
+- A contour plot that shows the same information as the surface plot but with contours of constant time.
+
+
 ## Methodology
 
 In order to navigate the complex thermodynamics of a lamb chop, we first consider a simplified model: a 10cm x 10cm x 10cm cube of iron at 0 degrees C. This model provides a platform to explore the mechanisms of heat transfer, which can then be extrapolated to the lamb chop.
