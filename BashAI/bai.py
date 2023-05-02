@@ -7,11 +7,18 @@ import json
 import logging
 from termcolor import colored
 import subprocess
+from dotenv import load_dotenv
 
 MAX_LINE_WIDTH = 80
 
-logging.basicConfig(filename='bai.log', level=logging.DEBUG)
+logging.basicConfig(filename='bai.log', level=logging.ERROR)
 logger = logging.getLogger(__name__)
+
+import time
+from halo import Halo
+
+spinner = Halo(text='Waiting for response...', spinner='dots12')
+
 
 def wrap_string(s, width):
     # helper function to wrap a string at a given width
@@ -46,6 +53,7 @@ def validate_arguments():
         sys.exit(1)
 
 def get_api_key():
+    load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY_BASHAI")
     if not api_key:
         logger.error("OPENAI_API_KEY_BASHAI environment variable is not set.")
@@ -107,10 +115,12 @@ def print_response(result):
     return command
 
 def main():
+    spinner.start()
     validate_arguments()
     api_key = get_api_key()
     response = call_openai_api(api_key, sys.argv[1])
     result = process_response(response)
+    spinner.stop()
     command = print_response(result)
     run_command(command)
 
