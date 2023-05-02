@@ -1,0 +1,4 @@
+halo==0.0.31
+openai==0.27.5
+python-dotenv==1.0.0
+termcolor==2.3.0
