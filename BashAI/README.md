@@ -10,9 +10,9 @@ BashAI is a Python program that uses the OpenAI API to provide users with Bash c
 ## Installation
 
 1. Install Python 3 if it is not already installed on your system.
-2. Install the termcolor library by running the following command:
+2. Use to to install requirements:
 
-        pip install termcolor
+        pip -m requirements.txt
 
 3. Set your OpenAI API key as an environment variable named OPENAI_API_KEY_BASHAI.
 
@@ -20,7 +20,7 @@ BashAI is a Python program that uses the OpenAI API to provide users with Bash c
 
 To use BashAI, run the following command in your terminal:
 
-        ./bashai.py "<your query>"
+        ./bai.py "<your query>"
 
 Replace <your query> with your query. BashAI will then use the OpenAI API to generate a Bash command in response to your query. BashAI will display the command along with an explanation of the command and any relevant notes.
 
@@ -28,7 +28,7 @@ You will be prompted to confirm whether or not you want to execute the command. 
 
 ## Add to PATH (optional)
 
-To make it possible to run bashai.py from anywhere in the terminal, you can add it to a directory that is already in your system's PATH. Here's how:
+To make it possible to run bai.py from anywhere in the terminal, you can add it to a directory that is already in your system's PATH. Here's how:
 
 1. Save a copy without the .py extension.
   
@@ -46,13 +46,13 @@ Note that you will need to use sudo to copy the file to this directory because i
 
 4. Make the bashai.py file executable by running the following command:
 
-        sudo chmod +x /usr/local/bin/bashai.py
+        sudo chmod +x /usr/local/bin/bai
 
-This command grants executable permission to the bashai.py file.
+This command grants executable permission to the bai file.
 
-5. Verify that you can run the bashai.py file from anywhere in the terminal by running the following command:
+5. Verify that you can run the bai file from anywhere in the terminal by running the following command:
 
-        bashai.py "<your query>"
+        bai "<your query>"
 
 If everything is set up correctly, BashAI should generate a Bash command in response to your query.
 
