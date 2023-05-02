@@ -7,7 +7,7 @@ BashAI is a Python program that uses the OpenAI API to provide users with Bash c
 1. Install Python 3 if it is not already installed on your system.
 2. Use to to install requirements:
 
-        pip -m requirements.txt
+        pip install -r requirements.txt
 
 3. Set your OpenAI API key as an environment variable named OPENAI_API_KEY_BASHAI.
 
