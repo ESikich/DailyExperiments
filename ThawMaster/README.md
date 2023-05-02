@@ -85,4 +85,4 @@ Our numerical simulations resulted in predictions that adhered remarkably well t
 
 ## Conclusion
 
-ThawMaster provides a detailed analysis of the thermodynamics involved in the thawing process of a frozen lamb chop. While the computations are conducted with an iron cube for simplicity and ease of computation, the principles and methodologies can be applied
+ThawMaster provides a detailed analysis of the thermodynamics involved in the thawing process of a frozen lamb chop. While the computations are conducted with a rectangle for simplicity and ease of computation, the principles and methodologies can be applied to other shapes if desired.
