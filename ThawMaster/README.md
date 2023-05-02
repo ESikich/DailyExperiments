@@ -19,7 +19,7 @@ To run this program, you will need:
 
 You can install these packages using pip:
 
-```pip install -m requirements.txt```
+```pip install -r requirements.txt```
 
 ## Program Details
 
