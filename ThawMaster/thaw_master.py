@@ -5,20 +5,26 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import multiprocessing
 
+# Convective Heat Transfer Coefficients
+# Air - free convection 5 - 37    
+# Air - low to moderate airspeed - 10 - 100
+# Air - high airspeed 100 - 200
+# Water - free convection - 100 - 12000
 
 # Constants
-SPEC_HEAT_CAP = 4.0  # in J/g°C
-DENS = 1.04  # in g/cm³
-W = 4.0  # in cm
-L = 6.0  # in cm
-H = 3.0  # in cm
-CONV_HEAT_TRANS_COEF = 10.0  # in W/m²K
-SIM_LEN = 10000.0  # in seconds
-SIM_STEPS = 1000
-INIT_TEMP_L = 0 # in °C
-INIT_TEMP_H = 5 # in °C
-ROOM_TEMP_L = 5 # in °C
-ROOM_TEMP_H = 21 # in °C
+SPEC_HEAT_CAP = 2.8  # in J/g°C
+DENS = 1.04  # g/cm³
+W = 4.0  # cm
+L = 6.0  # cm
+H = 3.0  # cm
+TARGET_TEMP = 15.0 # °C
+CONV_HEAT_TRANS_COEF = 18.0  # W/m²K
+SIM_LEN = 250000.0  # seconds
+SIM_STEPS = 10000
+INIT_TEMP_L = 0.0 # °C
+INIT_TEMP_H = 3.0 # °C
+ROOM_TEMP_L = 3.0 # °C
+ROOM_TEMP_H = 18.0 # °C
 
 # Derived constants
 VOLUME = W * L * H  # in cm³
@@ -39,10 +45,16 @@ def model(T: float, t: float, k: float, room_temp: float) -> float:
     return -k * (T - room_temp)
 
 def format_func(value, tick_number) -> str:
-    """Formats time values into appropriate units (hours, minutes)"""
-    hours = int(value // 3600)
+    """Formats time values into appropriate units (days, hours, minutes)"""
+    if np.isnan(value):
+        return ""
+    days = int(value // 86400)
+    hours = int((value % 86400) // 3600)
     minutes = int((value % 3600) // 60)
-    return f'{hours}h {minutes}m'
+    if days > 1:
+        return f'{days}d {hours}h'
+    else:
+        return f'{hours}h {minutes}m'
 
 def sim_temp_change(init_temp: float,
                     room_temp: float,) -> Tuple[float, float, float]:
@@ -53,9 +65,11 @@ def sim_temp_change(init_temp: float,
     T = odeint(model, init_temp, t, args=(k_value, room_temp))
     time_to_cool = None
     for i in range(T.shape[0]):
-        if abs(T[i] - room_temp) < 1:
+        if abs(T[i] - room_temp) <= 0.01:
             time_to_cool = t[i]
             break
+    if time_to_cool is None:
+        time_to_cool = np.nan  # replace None with NaN
     return init_temp, room_temp, time_to_cool
 
 def perform_simulation(init_temps: np.ndarray,
@@ -82,19 +96,22 @@ def perform_simulation(init_temps: np.ndarray,
         time_grid[row, col] = time_to_cool
     return time_grid
 
+
 def plot_results(init_grid: np.ndarray,
                  room_grid: np.ndarray,
                  time_grid: np.ndarray) -> None:
     """Plot the simulation results."""
     # Create a new figure for display
     fig = plt.figure(figsize=(12, 10))
-    ax = fig.add_subplot(211, 
+    ax = fig.add_subplot(211,
                          projection='3d',
                          proj_type='ortho',
                          azim=-120,
                          elev=30,
-                         box_aspect=(1,1,1))
+                         box_aspect=(1, 1, 1))
     # Draw the surface plot
+    ax.set_xlim(INIT_TEMP_L, INIT_TEMP_H)
+    ax.set_ylim(ROOM_TEMP_L, ROOM_TEMP_H)
     ax.plot_surface(init_grid,
                     room_grid,
                     time_grid,
@@ -103,48 +120,48 @@ def plot_results(init_grid: np.ndarray,
                     antialiased=True)
     ax.set_xlabel('Initial Temperature (°C)')
     ax.set_ylabel('Room Temperature (°C)')
-    ax.set_zlabel('Time to cool to within 1 degree of room temperature')
+    ax.set_zlabel('Time to Reach Room Temp')
     ax.zaxis.set_major_formatter(ticker.FuncFormatter(format_func))
 
     # Save the surface plot
     fig2 = plt.figure()
-    ax2 = fig2.add_subplot(111, 
-                         projection='3d',
-                         proj_type='ortho',
-                         azim=-120,
-                         elev=30,
-                         box_aspect=(1,1,1))
+    ax2 = fig2.add_subplot(111,
+                           projection='3d',
+                           proj_type='ortho',
+                           azim=-120,
+                           elev=30,
+                           box_aspect=(1, 1, 1))
     ax2.plot_surface(init_grid,
-                    room_grid,
-                    time_grid,
-                    cmap='coolwarm',
-                    linewidth=0,
-                    antialiased=True)
+                     room_grid,
+                     time_grid,
+                     cmap='coolwarm',
+                     linewidth=0,
+                     antialiased=True)
     ax2.set_xlabel('Initial Temperature (°C)')
     ax2.set_ylabel('Room Temperature (°C)')
-    ax2.set_zlabel('Time to cool to within 1 degree of room temperature')
+    ax2.set_zlabel('Time to Reach Room Temp')
     ax2.zaxis.set_major_formatter(ticker.FuncFormatter(format_func))
     fig2.savefig("3d_plot.png")
     plt.close(fig2)
 
+    min_time = np.min(time_grid)
+    max_time = np.max(time_grid)
+
     # Draw the contour plot
     ax3 = fig.add_subplot(212)
-    xlim = [INIT_TEMP_L, INIT_TEMP_H]
-    ylim = [INIT_TEMP_H, ROOM_TEMP_H]
-    ax3.set_xlim(xlim)
-    ax3.set_ylim(ylim)
-    mask = (init_grid >= xlim[0]) & (init_grid <= xlim[1]) & \
-        (room_grid >= ylim[0]) & (room_grid <= ylim[1])
-    time_grid_filtered = np.where(mask, time_grid, np.nan)
-    contour_levels = np.arange(0, 10000, 500)
+    ax3.set_xlim(INIT_TEMP_L, INIT_TEMP_H)
+    contour_levels = np.linspace(min_time, max_time, 16)
+
     contour_fill = ax3.contourf(init_grid,
                                 room_grid,
-                                time_grid_filtered,
+                                time_grid,
                                 levels=contour_levels,
-                                cmap='coolwarm')
+                                cmap='coolwarm',
+                                vmin=min_time,
+                                vmax=max_time)
     contour_lines = ax3.contour(init_grid,
                                 room_grid,
-                                time_grid_filtered,
+                                time_grid,
                                 levels=contour_levels,
                                 colors='k')
     ax3.set_xlabel('Initial Temperature (°C)')
@@ -160,18 +177,19 @@ def plot_results(init_grid: np.ndarray,
     # Save the contour plot
     fig4 = plt.figure()
     ax4 = fig4.add_subplot(111)
-    ax4.set_xlim(xlim)
-    ax4.set_ylim(ylim)
+    ax4.set_xlim(INIT_TEMP_L, INIT_TEMP_H)
     contour_fill_2 = ax4.contourf(init_grid,
                                 room_grid,
-                                time_grid_filtered,
+                                time_grid,
                                 levels=contour_levels,
-                                cmap='coolwarm')
+                                cmap='coolwarm',
+                                vmin=min_time,
+                                vmax=max_time)
     contour_lines_2 = ax4.contour(init_grid,
-                                room_grid,
-                                time_grid_filtered,
-                                levels=contour_levels,
-                                colors='k')
+                                  room_grid,
+                                  time_grid,
+                                  levels=contour_levels,
+                                  colors='k')
     ax4.set_xlabel('Initial Temperature (°C)')
     ax4.set_ylabel('Room Temperature (°C)')
     ax4.clabel(contour_lines_2,
@@ -179,13 +197,14 @@ def plot_results(init_grid: np.ndarray,
                fontsize=10,
                fmt=ticker.FuncFormatter(format_func))
     colorbar_2 = fig4.colorbar(contour_fill_2,
-                            ax=ax4,
-                            format=ticker.FuncFormatter(format_func))
+                               ax=ax4,
+                               format=ticker.FuncFormatter(format_func))
     fig4.savefig("contour_plot.png")
     plt.close(fig4)
 
     fig.tight_layout()
     plt.show()
+
 
 
 def main() -> None:
