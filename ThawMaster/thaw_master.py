@@ -13,7 +13,6 @@ W = 4.0  # in cm
 L = 6.0  # in cm
 H = 3.0  # in cm
 CONV_HEAT_TRANS_COEF = 10.0  # in W/m²K
-ROOM_TEMP = 20.0  # in °C
 SIM_LEN = 10000.0  # in seconds
 SIM_STEPS = 1000
 INIT_TEMP_L = 0 # in °C
