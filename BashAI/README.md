@@ -1,11 +1,9 @@
 # BashAI
 
 BashAI is a Python program that uses the OpenAI API to provide users with Bash commands in response to queries. BashAI interacts with users in a conversational manner and provides structured JSON responses that include a command to execute, an explanation of the command, and any relevant notes.
-##Dependencies
+## Dependencies
 
-- Python 3
-- OpenAI API
-- termcolor
+See dependencies.txt.
 
 ## Installation
 
@@ -57,3 +55,6 @@ This command grants executable permission to the bai file.
 If everything is set up correctly, BashAI should generate a Bash command in response to your query.
 
 Congratulations, you can now run BashAI from anywhere in the terminal!
+
+
+![Example](https://github.com/ESikich/DailyExperiments/blob/main/BashAI/screenshot.png?raw=true)
