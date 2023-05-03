@@ -1,5 +1,5 @@
 # DailyExperiments
-Trying to write one small piece of code per day.
+An attempt to rough out one idea per day.
 
 
 ## [BashAI](https://github.com/ESikich/DailyExperiments/tree/main/BashAI)
