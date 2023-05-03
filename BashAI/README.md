@@ -15,7 +15,7 @@ BashAI is a Python program that uses the OpenAI API to provide users with Bash c
 
 To use BashAI, run the following command in your terminal:
 
-        ./bai.py "<your query>"
+        python3 bai.py "<your query>"
 
 Replace <your query> with your query. BashAI will then use the OpenAI API to generate a Bash command in response to your query. BashAI will display the command along with an explanation of the command and any relevant notes.
 
