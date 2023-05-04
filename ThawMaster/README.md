@@ -67,9 +67,9 @@ The following key equations and constants are employed in our analysis:
 
 The constants used in the analysis are as follows:
 
-- Specific heat capacity of iron $c$: 0.45 J/g°C
-- Thermal conductivity of iron $k$: 80.2 W/m°C
-- Convection coefficient of air $h$: 10 W/m²°C
+- Specific heat capacity of a lamb chop $c$: 2.8 J/g°C
+- Thermal conductivity of a lamb chop $k$: 80.2 W/m°C
+- Convection coefficient of air $h$: 15 W/m²°C
 
 ## Data Analysis and Visualization
 
