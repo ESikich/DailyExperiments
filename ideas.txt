@@ -3,3 +3,4 @@ LinkedIn easy apply bot
 Harddrive bitcoin wallet address scanner - find my old wallet
 LinkedIn autoposter - Use GPT to find me a good daily article to post
 Job app auto form filler browser plugin -  (country, name, non-vet status etc)
+Bot to scrape Apple 2 facebook page
