@@ -35,7 +35,7 @@ This will output a list of directories separated by colons. These are the direct
 
 3. Choose one of the directories listed in the output of the previous command, and copy the bashai.py file to that directory. For example, if the output of the previous command includes /usr/local/bin, you can copy the bashai.py file to that directory by running the following command:
 
-        sudo cp bashai /usr/local/bin
+        sudo cp bai /usr/local/bin
 
 Note that you will need to use sudo to copy the file to this directory because it is owned by root.
 
