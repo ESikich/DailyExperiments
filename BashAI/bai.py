@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
 
-import openai
+import subprocess
 import sys
 import os
 import json
 import logging
 from termcolor import colored
-import subprocess
+import openai
 from dotenv import load_dotenv
+from halo import Halo
 
 MAX_LINE_WIDTH = 80
 
+# Logger configuration
 logging.basicConfig(filename='bai.log', level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
-import time
-from halo import Halo
-
+# Spinner configuration
 spinner = Halo(text='Waiting for response...', spinner='dots12')
 
-
 def wrap_string(s, width):
-    # helper function to wrap a string at a given width
     lines = []
     for paragraph in s.split("\n"):
         while len(paragraph) > width:
@@ -33,6 +31,32 @@ def wrap_string(s, width):
         lines.append(paragraph)
     return lines
 
+def get_system_info():
+    try:
+        # Command to get kernel version
+        kernel_version = subprocess.check_output('uname -r', shell=True).decode().strip()
+
+        # Command to get distribution name and version
+        os_release = subprocess.check_output('cat /etc/os-release', shell=True).decode()
+
+        # Parsing /etc/os-release for NAME and VERSION_ID
+        distro_name = None
+        distro_version = None
+        for line in os_release.split('\n'):
+            if line.startswith('NAME='):
+                distro_name = line.split('=')[1].strip('"')
+            if line.startswith('VERSION_ID='):
+                distro_version = line.split('=')[1].strip('"')
+
+        return {
+            "Kernel Version": kernel_version,
+            "Distro Name": distro_name,
+            "Distro Version": distro_version
+        }
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Error getting system info: {e}")
+        print(f"Error getting system info: {e}")
+        return None
 
 def run_command(command):
     run_command = input("Do you want to run this command? (y/n): ")
@@ -61,10 +85,10 @@ def get_api_key():
         sys.exit(1)
     return api_key
 
-def call_openai_api(api_key, query):
+def call_openai_api(api_key, query, system_info):
     openai.api_key = api_key
-    system_content = "You are now an expert human to bash interpreter for Debian 11 that only responds with commands and does not use markup."
-    user_content = f"You are now an expert human to bash interpreter for Debian 11. I will tell you what I want to do and you will show me the commands to execute. Respond in JSON structured text with three keys only: 'Explanation': with an explanation and any relevant related switches or options, 'Command': the command/s or script, and 'Notes': any additional info. Do not offer any commentary or explanations outside of the JSON. Use tabs and newlines but do not use markup. My query is: {query}"
+    system_content = f"You are now an expert human to bash interpreter for {system_info['Distro Name']} {system_info['Distro Version']} that only responds with commands and does not use markup."
+    user_content = f"You are now an expert human to bash interpreter for {system_info['Distro Name']} {system_info['Distro Version']}. I will tell you what I want to do and you will show me the commands to execute. Respond in JSON structured text with three keys only: 'Explanation': with an explanation and any relevant related switches or options, 'Command': the command/s or script, and 'Notes': any additional info. Do not offer any commentary or explanations outside of the JSON. Use tabs and newlines but do not use markup. My query is: {query}"
     try:
         response = openai.ChatCompletion.create(
             model = "gpt-3.5-turbo",
@@ -101,10 +125,10 @@ def print_response(result):
     print("\n")
     print(colored("=" * 80, "cyan"))
     print(colored("EXPLANATION:", "green"))
-    for line in wrap_string(explanation, 80):
+    for line in wrap_string(explanation, MAX_LINE_WIDTH):
         print(colored(line, "white"))
     print(colored("\nNOTES:", "red"))
-    notes_lines = wrap_string(notes, 80)
+    notes_lines = wrap_string(notes, MAX_LINE_WIDTH)
     if notes_lines:
         print(colored("\n".join(notes_lines), "white"))
     print(colored("=" * 80, "cyan"))
@@ -115,12 +139,19 @@ def print_response(result):
     return command
 
 def main():
-    spinner.start()
     validate_arguments()
     api_key = get_api_key()
-    response = call_openai_api(api_key, sys.argv[1])
+
+    system_info = get_system_info()
+    if not system_info:
+        print("Unable to determine system information.")
+        sys.exit(1)
+
+    spinner.start()
+    response = call_openai_api(api_key, sys.argv[1], system_info)
     result = process_response(response)
     spinner.stop()
+
     command = print_response(result)
     run_command(command)
 
